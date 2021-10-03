@@ -42,3 +42,30 @@
     width: 100px;
     background: navy
 }
+
+/* images */
+.book1 {
+    margin-top: -500px;
+}
+
+.float-container {
+    border: 3px solid #fff;
+    padding: 20px;
+}
+
+.float-child {
+    width: 50%;
+    float: left;
+    padding: 20px;
+}  
+
+.notes {
+    margin-top: 450px;
+}
+
+.notes-buttons {
+    padding-top: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

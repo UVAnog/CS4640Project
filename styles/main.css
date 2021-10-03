@@ -3,3 +3,42 @@
     text-decoration-color: red;
     font-size: 17px;
 }
+
+
+.height {
+    height: 100vh
+}
+
+.search {
+    position: relative;
+    box-shadow: 0 0 40px (51, 51, 51, .1)rgba
+}
+
+.searchbar {
+    padding-top: 64px;
+}
+
+.search input {
+    height: 60px;
+    text-indent: 25px;
+    border: 2px solid #d6d4d4
+}
+
+.search input:focus {
+    box-shadow: none;
+    border: 2px solid navy
+}
+
+.search .fa-search {
+    position: relative;
+    left: 16px
+}
+
+.search button {
+    position: absolute;
+    top: 30px;
+    right: 5px;
+    height: 50px;
+    width: 100px;
+    background: navy
+}

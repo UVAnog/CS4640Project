@@ -3,7 +3,8 @@
 <?php
     // define variables
     /** SETUP **/
-    $db = new mysqli("localhost", "nph2tx", "NolPres29", "nph2tx");
+    include("dbcredentials.php");
+    $mysqli= new mysqli($server , $user , $password , $database );
     
     $db->query("drop table if exists book;");
     $db->query("create table book (

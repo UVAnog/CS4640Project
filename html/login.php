@@ -1,6 +1,6 @@
 <?php
-
-    $mysqli= new mysqli(" localhost" ," nph2tx" ," NolPres29" ," nph2tx" );
+    include("dbcredentials.php");
+    $mysqli= new mysqli($server , $user , $password , $database );
     $error_msg="" ;
     // start session
     session_start();

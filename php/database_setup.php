@@ -1,10 +1,9 @@
-
-
 <?php
     // define variables
     /** SETUP **/
-    include("dbcredentials.php");
-    $mysqli= new mysqli($server , $user , $password , $database );
+    include("./database_connection.php");
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+    $db = new mysqli($dbserver , $dbuser , $dbpass , $dbdatabase );
     
     $db->query("drop table if exists book;");
     $db->query("create table book (

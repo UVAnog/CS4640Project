@@ -1,28 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="author" content="Nolan Harris" />
-    <meta name="description" content="Search and save books and create notes."
-      />
-    <meta name="keywords" content="books" />
+<?php
+/** DATABASE SETUP **/
+include('./database_connection.php');
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); // Extra Error Printing
+$mysqli = new mysqli($dbserver, $dbuser, $dbpass, $dbdatabase);
+$user = null;
 
-    <title>myBrary</title>
-    <link rel="stylesheet" href="../styles/main.css" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
-      crossorigin="anonymous"
-      />
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-      crossorigin="anonymous"></script>
-  </head>
-  <body>
+// Join session or start one
+session_start();
+
+// If the user's email is not set in the session, then it's not
+// a valid session (they didn't get here from the login page),
+// so we should send them over to log in first before doing
+// anything else!
+if (!isset($_SESSION["email"])) {
+    header("Location: index.php");
+    exit();
+}
+
+// set user information for the page
+$user = [
+    "email" => $_SESSION["email"]
+    ];
+?>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">  
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="Nolan Harris, Yaseen Bhuiyan">
+        <meta name="description" content="Search and save books and create notes">  
+        <title>myBrary</title>
+        <link rel="stylesheet" href="../styles/main.css" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> 
+    </head>
+
+    <body>
     <div>
       <nav
         class="navbar navbar-light navbar-expand-lg sticky-top"
@@ -30,7 +43,7 @@
         aria-label="Main Navigation
         Bar">
         <div class="container-xl">
-          <a class="navbar-brand" href="index.html"><div><img
+          <a class="navbar-brand" href="landing.php"><div><img
                 src="../assets/logo.svg" /></div></a>
           <button
             class="navbar-toggler"
@@ -47,21 +60,22 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item hover-item">
                 <a class="nav-link active" aria-current="page"
-                  href="index.html">Home</a>
+                  href="landing.php">Home</a>
               </li>
               <li class="nav-item hover-item">
-                <a class="nav-link" aria-current="page" href="books.html">Saved
+                <a class="nav-link" aria-current="page" href="books.php">Saved
                   Books</a>
               </li>
               <li class="nav-item hover-item">
-                <a class="nav-link" href="notes.html">Saved Notes</a>
+                <a class="nav-link" href="notes.php">Saved Notes</a>
               </li>
             </ul>
 
             <div class="" aria-labelledby="navbarDropdown">
               <div>
+              <p> User: <?=$user["email"]?> </p>
                 <button class="btn btn-primary"><a style="color: white;
-                    text-decoration: none" href="login.html">Sign in</a></button>
+                    text-decoration: none" href="index.php">Sign Out</a></button>
               </div>
             </div>
 
@@ -77,6 +91,7 @@
               number</i><input
               type="text"
               class="form-control"
+              default="Jane Eyre"
               placeholder="Search"
               /><button class="btn btn-primary">Search</button>
           </div>
@@ -149,5 +164,4 @@
       crossorigin="anonymous" async defer>
         </script>
   </body>
-
 </html>

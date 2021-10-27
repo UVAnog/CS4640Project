@@ -10,6 +10,7 @@
         id int not null auto_increment,
         title text not null,
         author text not null,
+        user_email text not null,
         primary key (id));");
     
     $db->query("drop table if exists user;");

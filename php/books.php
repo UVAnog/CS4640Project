@@ -19,8 +19,30 @@ if (!isset($_SESSION["email"])) {
 
 // set user information for the page
 $user = [
-    "email" => $_SESSION["email"]
+    "email" => $_SESSION["email"],
+    "books" => array()
     ];
+
+
+    // get books associated with current user
+    // rewrite using $_GET
+    $stmt = $mysqli->prepare("select * from book where user_email = ?;");
+    $stmt->bind_param("s", $user["email"]);
+    if (!$stmt->execute()) {
+        $error_msg = "Error checking for user";
+    } else { 
+        // result succeeded
+        $res = $stmt->get_result();
+        $data = $res->fetch_all(MYSQLI_ASSOC);
+        
+        if (!empty($data)) { //(isset($data[0])) {
+          $user["books"] = $data;
+        } else {
+          $error_msg = "Error: no books in library";
+        }
+      }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -113,64 +135,42 @@ $user = [
 
           <br />
 
-          <table class="table table-striped">
-            <tbody>
-              <tr>
-                <td>
-                  <img
-                    src="../assets/harry_potter.jpg"
-                    class="book"
-                    alt="Harry Potter"
-                  />
-                </td>
-                <td>
-                  <div>Harry Potter</div>
-                  <div>J.K. Rowling</div>
-                  <br />
-                  <button class="btn btn-danger">
-                    Remove from Saved Books
-                  </button>
-                  <button class="btn btn-primary">View Notes</button>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <img
-                    src="../assets/brave_new_world.jpg"
-                    class="book"
-                    alt="Brave New World"
-                  />
-                </td>
-                <td>
-                  <div>Brave New World</div>
-                  <div>Alduous Huxley</div>
-                  <br />
-                  <button class="btn btn-danger">
-                    Remove from Saved Books
-                  </button>
-                  <button class="btn btn-primary">View Notes</button>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <img
-                    src="../assets/to_kill_a_mockingbird.jpg"
-                    class="book"
-                    alt="To Kill A Mockingbird"
-                  />
-                </td>
-                <td>
-                  <div>To Kill A Mockingbird</div>
-                  <div>Harper Lee</div>
-                  <br />
-                  <button class="btn btn-danger">
-                    Remove from Saved Books
-                  </button>
-                  <button class="btn btn-primary">View Notes</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+<div>
+
+<?php
+
+if (!empty($user["books"])) {
+$title=$user["books"]["0"]["title"];
+$author=$user["books"]["0"]["author"];
+}
+
+
+                    if (empty($user["books"])) {
+                        echo "<div class='alert alert-danger'>No books in your library
+                        <button><a href='landing.php'>Add new books</a></button>
+                        </div>";
+                    } else if (!empty($user["books"])) {
+                      echo "<div>
+                      <p> Books: </p>
+                      <p> Title: $title </p>  
+                      <p> Author: $author </p>
+                      </div>";
+                    }
+                ?>
+
+
+
+
+    <form method="post" action="delete.php">
+      <input type="hidden" name="title" value=<?=$user["books"]["0"]["title"]?> >
+      <input type="Submit" name="submit" value="delete">
+    </form>
+
+
+    </div>
+
+
+          
         </div>
       </div>
         </div>

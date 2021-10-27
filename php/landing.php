@@ -19,9 +19,65 @@ if (!isset($_SESSION["email"])) {
 
 // set user information for the page
 $user = [
-    "email" => $_SESSION["email"]
-    ];
+  "email" => $_SESSION["email"]
+  ];
+$user_email = $_SESSION["email"];
+
+
+if (isset($_POST["title"])) { // validate the title coming in
+  $stmt = $mysqli->prepare("select * from book where user_email = ?;");
+  $stmt->bind_param("s", $user["email"]);
+  if (!$stmt->execute()) {
+      $error_msg = "Error checking for user";
+  } else { 
+      // result succeeded
+      $res = $stmt->get_result();
+      $data = $res->fetch_all(MYSQLI_ASSOC);
+      
+      if (!empty($data)) { //(isset($data[0])) {
+          // user was found!
+          
+          // validate the user's title
+
+          
+            $stmt = $mysqli->prepare("select * from book where title = ?;");
+            $stmt->bind_param("s", $_POST["title"]);
+            if (!$stmt->execute()) {
+                $error_msg = "Error checking for title";
+            } else { 
+                // result succeeded
+                $res = $stmt->get_result();
+                $data = $res->fetch_all(MYSQLI_ASSOC);
+                
+                if (!empty($data)) { //(isset($data[0])) {
+                  $error_msg = "Book already exists in user library";
+                }
+              }
+
+
+          
+      } else {
+          // book was not found, create the book
+         
+          
+          
+          $insert = $mysqli->prepare("insert into book (title, author, user_email) values (?, ?, ?);");
+          $insert->bind_param("sss", $_POST["title"], $_POST["author"], $user["email"]);
+          if (!$insert->execute()) {
+              $error_msg = "Error creating new book";
+          } 
+          
+          // Save user information into the session to use later
+          
+          header("Location: books.php");
+          exit();
+      }
+  }
+}
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html>
@@ -83,79 +139,35 @@ $user = [
         </div>
       </nav>
     </div>
-    <div class="container searchbar">
-      <div class="row height d-flex justify-content-center">
-        <div class="col-md-8">
-          <div class="search">
-            <i class="fa fa-search">Search for books by Title, Author, or IBSN
-              number</i><input
-              type="text"
-              class="form-control"
-              default="Jane Eyre"
-              placeholder="Search"
-              /><button class="btn btn-primary">Search</button>
-          </div>
-          <div>
-            <div>
-              <h4>Showing search results for:</h4>
+    <div class="container">
+    <div class="container" style="margin-top: 15px;">
+            <div class="row col-xs-8">
+                
+                <p> Enter Book Title and Author: </p>
             </div>
-            <div>
-              <h3 class="text-primary"><i>"Jane Eyre"</i></h3>
+            <div class="row justify-content-center">
+                <div class="col-4">
+                <?php
+                    if (!empty($error_msg)) {
+                        echo "<div class='alert alert-danger'>$error_msg</div>";
+                    }
+                ?>
+                <form action="landing.php" method="post">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="title" class="form-control" id="title" name="title"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="author" class="form-label">Author</label>
+                        <input type="author" class="form-control" id="author" name="author"/>
+                    </div>
+                    <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Add New Book</button>
+                    </div>
+                </form>
+                </div>
             </div>
-          </div>
-          <br />
-
-          <table class="table table-striped">
-            <tbody>
-              <tr>
-                <td>
-                  <img
-                    src="../assets/jane_eyre_1.jpg"
-                    class="book"
-                    alt="Jane Eyre 1"
-                    />
-                </td>
-                <td>
-                  <div>Jane Eyre</div>
-                  <div>Charlotte Bronte</div>
-                  <br />
-                  <button class="btn btn-primary">Add to Saved Books</button>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <img
-                    src="../assets/jane_eyre_2.jpg"
-                    class="book"
-                    alt="Jane Eyre 2"
-                    />
-                </td>
-                <td>
-                  <div>Jane Eyre</div>
-                  <div>Charlotte Bronte</div>
-                  <br />
-                  <button class="btn btn-primary">Add to Saved Books</button>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <img
-                    src="../assets/jane_eyre_3.jpg"
-                    class="book"
-                    alt="Jane Eyre 3"
-                    />
-                </td>
-                <td>
-                  <div>Jane Eyre</div>
-                  <div>Charlotte Bronte</div>
-                  <br />
-                  <button class="btn btn-primary">Add to Saved Books</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
-      </div>
     </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"

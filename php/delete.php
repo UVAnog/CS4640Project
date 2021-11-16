@@ -6,7 +6,7 @@ $mysqli = new mysqli($dbserver, $dbuser, $dbpass, $dbdatabase);
 
 
 $title=$_POST['title'];
-mysqli_query($mysqli, "DELETE FROM book WHERE title=$title");
+mysqli_query($mysqli, "DELETE FROM book WHERE title='$title'");
 header("Location: books.php");
-    exit();
+exit();
 ?>

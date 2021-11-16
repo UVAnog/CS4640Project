@@ -23,7 +23,6 @@ $user = [
     "books" => array()
     ];
 
-
     // get books associated with current user
     // rewrite using $_GET
     $stmt = $mysqli->prepare("select * from book where user_email = ?;");
@@ -36,13 +35,12 @@ $user = [
         $data = $res->fetch_all(MYSQLI_ASSOC);
         
         if (!empty($data)) { //(isset($data[0])) {
-          $user["books"] = $data;
+          $json = json_encode($data, JSON_PRETTY_PRINT);
+          $user["books"] = json_decode($json, true);
         } else {
           $error_msg = "Error: no books in library";
         }
       }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -55,17 +53,71 @@ $user = [
         <title>myBrary</title>
         <link rel="stylesheet" href="../styles/main.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> 
-    </head>
+    
+        <script type="text/javascript">
+          var books = <?php echo json_encode($user["books"]); ?>;
 
-    <body>
-        <div>
+          const test = () => {
+            // this works!!
+            console.log(books);
+            document.getElementById("message").innerHTML = "" + books[0].title + ", " + books[0].author;
+          }
+
+          function displayBooks() {
+        
+            var table = document.getElementById("book-table");
+
+            books.forEach((book) => {
+              var newRow = table.insertRow(table.rows.length);
+              newRow.insertCell(0).textContent = book.title;
+              newRow.insertCell(1).textContent = book.author;
+              newRow.insertCell(2).innerHTML =
+                '<button class="btn btn-sm btn-danger" onclick="">Delete</button>'; //NEED TO ADD DELETE FUNCTION
+              /* newRow.addEventListener("mouseover", function () {
+                table.clickedRow = this.rowIndex;
+              }) */
+        });
+
+      }
+
+          function getSearchBooks() { // use ajax for search functionality?
+            // instantiate the object
+            var ajax = new XMLHttpRequest();
+            // open the request
+            ajax.open("GET", "?command=get_question", true);
+            // ask for a specific response
+            ajax.responseType = "json";
+            // send the request
+            ajax.send(null);
+            
+            // What happens if the load succeeds
+            ajax.addEventListener("load", function() {
+                // set question
+                if (this.status == 200) { // worked 
+                    question = this.response;
+                    displayQuestion();
+                }
+            });
+            
+            // What happens on error
+            ajax.addEventListener("error", function() {
+                document.getElementById("message").innerHTML = 
+                    "<div class='alert alert-danger'>An Error Occurred</div>";
+            });
+        }
+        </script>
+    
+     </head>
+
+    <body onload="displayBooks()">
+      <div>
       <nav
         class="navbar navbar-light navbar-expand-lg sticky-top"
         style="background-color: #e3f2fd"
         aria-label="Main Navigation
         Bar">
         <div class="container-xl">
-          <a class="navbar-brand" href="landing.php"><div><img
+          <a class="navbar-brand" href="home.php"><div><img
                 src="../assets/logo.svg" /></div></a>
           <button
             class="navbar-toggler"
@@ -82,7 +134,7 @@ $user = [
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item hover-item">
                 <a class="nav-link active" aria-current="page"
-                  href="landing.php">Home</a>
+                  href="home.php">Home</a>
               </li>
               <li class="nav-item hover-item">
                 <a class="nav-link" aria-current="page" href="books.php">Saved
@@ -120,65 +172,72 @@ $user = [
           </div>
         </div>
       </nav>
-        </div>
+      </div>
         <div class="container searchbar">
-        <div class="row height d-flex">
-        <div class="col-md-8">
-          <div class="search">
-            <i class="fa fa-search">Search your books</i
-            ><input
-              type="text"
-              class="form-control"
-              placeholder="Search"
-            /><button class="btn btn-primary">Search</button>
-          </div>
+          <div class="row height d-flex">
+            <div class="col-md-8">
+              <div class="search">
+                <i class="fa fa-search">Search your books</i
+                ><input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search"
+                /><button class="btn btn-primary">Search</button>
+              </div>
 
-          <br />
+              <br />
 
-<div>
+              <button onclick="test()">Test</button>
+              <div id="message"></div>
 
-<?php
+              <table id="book-table" class="table table-striped">
+                <tr class="table-dark">
+                  <th style="text-align: center;">Title</th>
+                  <th style="text-align: center;">Author</th>
+                  <th style="text-align: center;">Actions</th>
+                </tr>
+              </table>
 
-if (!empty($user["books"])) {
-$title=$user["books"]["0"]["title"];
-$author=$user["books"]["0"]["author"];
-}
+              <div>
 
+                <?php
+                  if (!empty($user["books"])) {
+                    // this only displays the FIRST book in the database fetch result
+                    $title=$user["books"]["0"]["title"];
+                    $author=$user["books"]["0"]["author"];
+                  }
 
-                    if (empty($user["books"])) {
-                        echo "<div class='alert alert-danger'>No books in your library
-                        <button><a href='landing.php'>Add new books</a></button>
-                        </div>";
-                    } else if (!empty($user["books"])) {
-                      echo "<div>
+                  if (empty($user["books"])) {
+                    echo "<div class='alert alert-danger'>No books in your library
+                      <button><a href='home.php'>Add new books</a></button>
+                      </div>";
+                  } else if (!empty($user["books"])) {
+                    echo "<div>
                       <p> Books: </p>
                       <p> Title: $title </p>  
                       <p> Author: $author </p>
                       </div>";
-                    }
+                  }
                 ?>
 
+                <form method="post" action="delete.php">
+                  <input type="hidden" id="title" name="title" value=<?=$user["books"]["0"]["title"]?> >
+                  <input type="Submit" name="submit" name="submit" value="delete">
+                </form>
 
-
-
-    <form method="post" action="delete.php">
-      <input type="hidden" name="title" value=<?=$user["books"]["0"]["title"]?> >
-      <input type="Submit" name="submit" value="delete">
-    </form>
-
-
+            </div>
+          </div>
+        </div>
     </div>
 
-
-          
-        </div>
-      </div>
-        </div>
         <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
-      crossorigin="anonymous" async defer>
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
+          crossorigin="anonymous" 
+          async 
+          defer>
         </script>
+
     </body>
 </html>

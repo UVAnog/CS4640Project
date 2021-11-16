@@ -36,7 +36,7 @@ if (isset($_POST["email"])) { /// validate the email coming in
             if (password_verify($_POST["password"], $data[0]["password"])) {
                 // Save user information into the session to use later
                 $_SESSION["email"] = $data[0]["email"];
-                header("Location: landing.php");
+                header("Location: home.php");
                 exit();
             } else {
                 // User was found but entered an invalid password
@@ -54,7 +54,7 @@ if (isset($_POST["email"])) { /// validate the email coming in
             
             // Save user information into the session to use later
             $_SESSION["email"] = $_POST["email"];
-            header("Location: landing.php");
+            header("Location: home.php");
             exit();
         }
     }

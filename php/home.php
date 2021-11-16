@@ -38,8 +38,6 @@ if (isset($_POST["title"])) { // validate the title coming in
           // user was found!
           
           // validate the user's title
-
-          
             $stmt = $mysqli->prepare("select * from book where title = ?;");
             $stmt->bind_param("s", $_POST["title"]);
             if (!$stmt->execute()) {
@@ -51,16 +49,21 @@ if (isset($_POST["title"])) { // validate the title coming in
                 
                 if (!empty($data)) { //(isset($data[0])) {
                   $error_msg = "Book already exists in user library";
+                } else {
+                  // book was not found, create the book
+                  $insert = $mysqli->prepare("insert into book (title, author, user_email) values (?, ?, ?);");
+                  $insert->bind_param("sss", $_POST["title"], $_POST["author"], $user["email"]);
+                  if (!$insert->execute()) {
+                      $error_msg = "Error creating new book";
+                  } 
+                  
+                  // Save user information into the session to use later
+                  header("Location: books.php");
+                  exit();
                 }
               }
-
-
-          
       } else {
           // book was not found, create the book
-         
-          
-          
           $insert = $mysqli->prepare("insert into book (title, author, user_email) values (?, ?, ?);");
           $insert->bind_param("sss", $_POST["title"], $_POST["author"], $user["email"]);
           if (!$insert->execute()) {
@@ -68,16 +71,12 @@ if (isset($_POST["title"])) { // validate the title coming in
           } 
           
           // Save user information into the session to use later
-          
           header("Location: books.php");
           exit();
       }
   }
 }
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html>
@@ -99,7 +98,7 @@ if (isset($_POST["title"])) { // validate the title coming in
         aria-label="Main Navigation
         Bar">
         <div class="container-xl">
-          <a class="navbar-brand" href="landing.php"><div><img
+          <a class="navbar-brand" href="home.php"><div><img
                 src="../assets/logo.svg" /></div></a>
           <button
             class="navbar-toggler"
@@ -116,7 +115,7 @@ if (isset($_POST["title"])) { // validate the title coming in
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item hover-item">
                 <a class="nav-link active" aria-current="page"
-                  href="landing.php">Home</a>
+                  href="home.php">Home</a>
               </li>
               <li class="nav-item hover-item">
                 <a class="nav-link" aria-current="page" href="books.php">Saved
@@ -152,7 +151,7 @@ if (isset($_POST["title"])) { // validate the title coming in
                         echo "<div class='alert alert-danger'>$error_msg</div>";
                     }
                 ?>
-                <form action="landing.php" method="post">
+                <form action="home.php" method="post">
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
                         <input type="title" class="form-control" id="title" name="title"/>

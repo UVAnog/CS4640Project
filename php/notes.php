@@ -19,8 +19,75 @@ if (!isset($_SESSION["email"])) {
 
 // set user information for the page
 $user = [
-    "email" => $_SESSION["email"]
+    "email" => $_SESSION["email"],
+    "books" => array(),
+    "notes" => array()
     ];
+
+    // get books associated with current user
+    $stmt = $mysqli->prepare("select * from book where user_email = ?;");
+    $stmt->bind_param("s", $user["email"]);
+    if (!$stmt->execute()) {
+        $error_msg = "Error checking for user";
+    } else { 
+        // result succeeded
+        $res = $stmt->get_result();
+        $data = $res->fetch_all(MYSQLI_ASSOC);
+        
+        if (!empty($data)) { //(isset($data[0])) {
+          $json = json_encode($data, JSON_PRETTY_PRINT);
+          $user["books"] = json_decode($json, true);
+        } else {
+          $error_msg = "Error: no books in library";
+        }
+      }
+
+    // get notes associated with current user
+    $stmt = $mysqli->prepare("select * from note where user_email = ?;");
+    $stmt->bind_param("s", $user["email"]);
+    if (!$stmt->execute()) {
+        $error_msg = "Error checking for user";
+    } else { 
+        // result succeeded
+        $res = $stmt->get_result();
+        $data = $res->fetch_all(MYSQLI_ASSOC);
+        
+        if (!empty($data)) { //(isset($data[0])) {
+          $json = json_encode($data, JSON_PRETTY_PRINT);
+          $user["notes"] = json_decode($json, true);
+        } else {
+          $error_msg = "Error: no notes in library";
+        }
+      }
+
+      if (isset($_POST["book"]) && isset($_POST["note"])) { // validate the note coming in
+        $stmt = $mysqli->prepare("select * from note where book_title = ? and text = ?;");
+        $stmt->bind_param("ss", $_POST["book"], $_POST["note"]);
+        if (!$stmt->execute()) {
+            $error_msg = "Error checking for note";
+        } else {
+          // result succeeded
+          $res = $stmt->get_result();
+          $data = $res->fetch_all(MYSQLI_ASSOC);
+          
+          if (!empty($data)) {
+            // note was found
+            $error_msg = "Error: note already exists!";
+          } else {
+            // note was not found, create the note
+            $insert = $mysqli->prepare("insert into note (user_email, book_title, text) values (?, ?, ?);");
+            $insert->bind_param("sss", $user["email"], $_POST["book"], $_POST["note"]);
+            if (!$insert->execute()) {
+                $error_msg = "Error creating new note";
+            } 
+            
+            // Save user information into the session to use later
+            header("Location: notes.php");
+            exit();
+          }
+        }
+      }
+
 ?>
 
 <!DOCTYPE html>
@@ -33,9 +100,62 @@ $user = [
         <title>myBrary</title>
         <link rel="stylesheet" href="../styles/main.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> 
+    
+        <script>
+
+          function onLoad() {
+            setDropdownOptions();
+            displayNotes();
+            setSearchbar();
+          }
+
+          function setDropdownOptions () {
+            var books = <?php echo json_encode($user["books"]); ?>;
+            var dropdown = document.getElementById("book");
+            for (var i=0; i<books.length; i++){
+              var newOption = document.createElement("option");
+              newOption.value = books[i].title;
+              newOption.innerHTML = books[i].title;
+              dropdown.appendChild(newOption);
+            }
+          }
+
+          function validateForm() {
+            let note = document.getElementById("note").value;
+            if(note==""){
+              alert("Error: Note field must be filled out!")
+              return false;
+            }
+          }
+
+          var notes = <?php echo json_encode($user["notes"]); ?>;
+
+          const displayNotes = () => {
+            var table = document.getElementById("note-table");
+
+            notes.forEach((note) => {
+              var newRow = table.insertRow(table.rows.length);
+              newRow.insertCell(0).textContent = note.book_title;
+              newRow.insertCell(1).textContent = note.text;
+              newRow.insertCell(2).innerHTML =
+                `<button class="btn btn-sm btn-danger" onclick="location.href='delete.php?title=${note.book_title}&note=${note.text}'";>Delete</button>`;
+            });
+          }
+
+          function setSearchbar() {
+            var searchbar = document.getElementById("searchbar");
+            if(notes.length === 0){
+              searchbar.setAttribute("disabled", "true");
+            } else {
+              searchbar.removeAttribute("disabled");
+            }
+          }
+
+        </script>
+
     </head>
 
-    <body>
+    <body onload="onLoad()">
         <div>
       <nav
         class="navbar navbar-light navbar-expand-lg sticky-top"
@@ -59,7 +179,7 @@ $user = [
           <div class="collapse navbar-collapse" id="navbarsTop">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item hover-item">
-                <a class="nav-link active" aria-current="page"
+                <a class="nav-link" aria-current="page"
                   href="home.php">Home</a>
               </li>
               <li class="nav-item hover-item">
@@ -67,7 +187,7 @@ $user = [
                   Books</a>
               </li>
               <li class="nav-item hover-item">
-                <a class="nav-link" href="notes.php">Saved Notes</a>
+                <a class="nav-link active" href="notes.php">Saved Notes</a>
               </li>
             </ul>
 
@@ -104,110 +224,47 @@ $user = [
                 <div class="col-md-8">
                     <div class="search"><i class="fa fa-search">Search your
                             notes</i><input
+                            id="searchbar"
                             type="text" class="form-control"
                             placeholder="Search"><button class="btn
                             btn-primary">Search</button>
                     </div>
+                    
+                    <div style="padding: 10px; margin-top: 20px; border: 1px solid black;">
+                      <?php
+                        if (!empty($error_msg)) {
+                          echo "<div class='alert alert-danger'>$error_msg</div>";
+                        }
+                      ?>
+
+                      <label for="form">Add a New Note</label>
+                      <form id="form" action="notes.php" onsubmit="return validateForm()" method="post">
+                        <div class="mb-3">
+                          <label for="book">Choose a Book:</label>
+                          <select name="book" id="book"></select>
+                        </div>
+                        <div class="mb-3">
+                          <label for="note" class="form-label">Enter note:</label>
+                          <input type="note" class="form-control" id="note" name="note"/>
+                        </div>
+                        <div class="text-center">
+                          <button type="submit" class="btn btn-primary">Add New Note</button>
+                        </div>
+                      </form>
+
+                      <table id="note-table" class="table table-striped" style="margin-top: 20px;">
+                        <tr class="table-dark">
+                          <th style="text-align: center;">Book Title</th>
+                          <th style="text-align: center;">Note Text</th>
+                          <th style="text-align: center;">Actions</th>
+                        </tr>
+                      </table>
+                    </div>
+
                 </div>
             </div>
         </div>
-        <div class="container">
-            <div class="book1 float-container">
-                <div class="image1 float-child col-md-6">
-                    <div>
-                        <img src="../assets/harry_potter.jpg" height="400px"
-                            width="300px"
-                            />
-                    </div>
-                </div>
-                <div class="notes-text float-child col-md-6">
-                    <div class="book-info">
-                        <div style="text-decoration: underline;"><h5>Notes for:</h5></div>
-                        <div style="padding-top: 16px;"><h3>Harry Potter and the
-                                Deathly Hallows</h3></div>
-                        <div style="padding-top: 16px;"><h6>J.K Rowling</h6></div>
-                    </div>
-                </div>
-
-                <div class="notes container">
-                    <div class="notes1">
-                        <div><h1>1.</h1></div>
-                        <div class="notes-text" style="padding-top: 16px;">
-                            Harry Potter and the Deathly Hallows is a fantasy
-                            novel
-                            written by British author J. K. Rowling and the
-                            seventh
-                            and final novel of the Harry Potter series. It was
-                            released on 21 July 2007 in the United Kingdom by
-                            Bloomsbury Publishing, in the United States by
-                            Scholastic, and in Canada by Raincoast Books. The
-                            novel
-                            chronicles the events directly following Harry
-                            Potter
-                            and the Half-Blood Prince (2005) and the final
-                            confrontation between the wizards Harry Potter and
-                            Lord
-                            Voldemort.
-
-                            Deathly Hallows shattered sales records upon
-                            release,
-                            surpassing marks set by previous titles of the Harry
-                            Potter series. It holds the Guinness World Record
-                            for
-                            most novels sold within 24 hours of release, with
-                            8.3
-                            million sold in the US and 2.65 million in the
-                            UK.[1][2]
-                            Generally well received by critics, the book won the
-                            2008 Colorado Blue Spruce Book Award, and the
-                            American
-                            Library Association named it the "Best Book for
-                            Young
-                            Adults". A film adaptation of the novel was released
-                            in
-                            two parts: Harry Potter and the Deathly Hallows –
-                            Part 1
-                            in November 2010 and Part 2 in July 2011.
-                        </div>
-                        <div class="notes-buttons">
-                            <div><button class="btn
-                                    btn-primary">Edit</button></div>
-                            <div style="padding: 32px;"><button class="btn
-                                    btn-danger">Delete</button></div>
-                        </div>
-                    </div>
-                    <div class="notes2">
-                        <div><h1>2.</h1></div>
-                        <div class="notes-text" style="padding-top: 16px;">
-                            Throughout the six previous novels in the series,
-                            the
-                            main character Harry Potter has struggled with the
-                            difficulties of adolescence along with being famous
-                            as
-                            the only person ever to survive the Killing Curse.
-                            The
-                            curse was cast by Tom Riddle, better known as Lord
-                            Voldemort, a powerful evil wizard who murdered
-                            Harry's
-                            parents and attempted to kill Harry as a baby, due
-                            to a
-                            prophecy which claimed Harry would be able to stop
-                            him.
-                            As an orphan, Harry was placed in the care of his
-                            Muggle
-                            (non-magical) relatives Petunia Dursley and Vernon
-                            Dursley, with their son Dudley Dursley.
-                        </div>
-                        <div class="notes-buttons">
-                            <div><button class="btn
-                                    btn-primary">Edit</button></div>
-                            <div style="padding: 32px;"><button class="btn
-                                    btn-danger">Delete</button></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
       rel="stylesheet"

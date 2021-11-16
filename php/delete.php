@@ -4,9 +4,16 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); // Extra Error Printi
 $mysqli = new mysqli($dbserver, $dbuser, $dbpass, $dbdatabase);
 
 
-
 $title=$_GET['title'] ? $_GET['title'] : $_POST['title'];
-mysqli_query($mysqli, "DELETE FROM book WHERE title='$title'");
-header("Location: books.php");
+if ($_GET['note']) {
+    // delete note
+    $note = $_GET['note'];
+    mysqli_query($mysqli, "DELETE FROM note WHERE book_title='$title' AND text='$note'");
+    header("Location: notes.php");
+  } else {
+      // delete book
+    mysqli_query($mysqli, "DELETE FROM book WHERE title='$title'");
+    header("Location: books.php");
+  }
 exit();
 ?>

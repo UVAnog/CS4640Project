@@ -57,14 +57,7 @@ $user = [
         <script type="text/javascript">
           var books = <?php echo json_encode($user["books"]); ?>;
 
-          const test = () => {
-            // this works!!
-            console.log(books);
-            document.getElementById("message").innerHTML = "" + books[0].title + ", " + books[0].author;
-          }
-
           function displayBooks() {
-        
             var table = document.getElementById("book-table");
 
             books.forEach((book) => {
@@ -72,39 +65,9 @@ $user = [
               newRow.insertCell(0).textContent = book.title;
               newRow.insertCell(1).textContent = book.author;
               newRow.insertCell(2).innerHTML =
-                '<button class="btn btn-sm btn-danger" onclick="">Delete</button>'; //NEED TO ADD DELETE FUNCTION
-              /* newRow.addEventListener("mouseover", function () {
-                table.clickedRow = this.rowIndex;
-              }) */
-        });
-
-      }
-
-          function getSearchBooks() { // use ajax for search functionality?
-            // instantiate the object
-            var ajax = new XMLHttpRequest();
-            // open the request
-            ajax.open("GET", "?command=get_question", true);
-            // ask for a specific response
-            ajax.responseType = "json";
-            // send the request
-            ajax.send(null);
-            
-            // What happens if the load succeeds
-            ajax.addEventListener("load", function() {
-                // set question
-                if (this.status == 200) { // worked 
-                    question = this.response;
-                    displayQuestion();
-                }
+                `<button class="btn btn-sm btn-danger" onclick="location.href='delete.php?title=${book.title}'";>Delete</button>`; //NEED TO ADD DELETE FUNCTION
             });
-            
-            // What happens on error
-            ajax.addEventListener("error", function() {
-                document.getElementById("message").innerHTML = 
-                    "<div class='alert alert-danger'>An Error Occurred</div>";
-            });
-        }
+          }
         </script>
     
      </head>
@@ -187,9 +150,6 @@ $user = [
 
               <br />
 
-              <button onclick="test()">Test</button>
-              <div id="message"></div>
-
               <table id="book-table" class="table table-striped">
                 <tr class="table-dark">
                   <th style="text-align: center;">Title</th>
@@ -201,29 +161,12 @@ $user = [
               <div>
 
                 <?php
-                  if (!empty($user["books"])) {
-                    // this only displays the FIRST book in the database fetch result
-                    $title=$user["books"]["0"]["title"];
-                    $author=$user["books"]["0"]["author"];
-                  }
-
                   if (empty($user["books"])) {
                     echo "<div class='alert alert-danger'>No books in your library
                       <button><a href='home.php'>Add new books</a></button>
                       </div>";
-                  } else if (!empty($user["books"])) {
-                    echo "<div>
-                      <p> Books: </p>
-                      <p> Title: $title </p>  
-                      <p> Author: $author </p>
-                      </div>";
                   }
                 ?>
-
-                <form method="post" action="delete.php">
-                  <input type="hidden" id="title" name="title" value=<?=$user["books"]["0"]["title"]?> >
-                  <input type="Submit" name="submit" name="submit" value="delete">
-                </form>
 
             </div>
           </div>

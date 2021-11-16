@@ -128,6 +128,31 @@ $user = [
             }
           }
 
+          function deleteNote(title, note) {
+            // instantiate the object
+            var ajax = new XMLHttpRequest();
+            // open the request
+            ajax.open("GET", `delete.php?title=${title}&note=${note}`, true);
+            // ask for a specific response
+            ajax.responseType = "json";
+            // send the request
+            ajax.send(null);
+            
+            // What happens if the load succeeds
+            ajax.addEventListener("load", function() {
+                // refresh page
+                if (this.status == 200) { // worked 
+                  location.href = "notes.php"
+                }
+            });
+            
+            // What happens on error
+            ajax.addEventListener("error", function() {
+                document.getElementById("message").innerHTML = 
+                    "<div class='alert alert-danger'>An Error Occurred</div>";
+            });
+        }
+
           var notes = <?php echo json_encode($user["notes"]); ?>;
 
           const displayNotes = () => {
@@ -137,8 +162,8 @@ $user = [
               var newRow = table.insertRow(table.rows.length);
               newRow.insertCell(0).textContent = note.book_title;
               newRow.insertCell(1).textContent = note.text;
-              newRow.insertCell(2).innerHTML =
-                `<button class="btn btn-sm btn-danger" onclick="location.href='delete.php?title=${note.book_title}&note=${note.text}'";>Delete</button>`;
+              var newButton = newRow.insertCell(2).innerHTML =
+                `<button class="btn btn-sm btn-danger" onclick="deleteNote(\'${note.book_title}\', \'${note.text}\')";>Delete</button>`;
             });
           }
 
@@ -276,6 +301,8 @@ $user = [
                           <th style="text-align: center;">Actions</th>
                         </tr>
                       </table>
+
+                      <div id="message"></div>
                     </div>
 
                 </div>

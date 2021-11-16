@@ -21,4 +21,10 @@
         password text not null,
         primary key (id));"); 
 
-    
+    $db->query("drop table if exists note;");
+    $db->query("create table note (
+        id int not null auto_increment,
+        user_email text not null,
+        book_title text not null,
+        text text not null,
+        primary key (id));"); 

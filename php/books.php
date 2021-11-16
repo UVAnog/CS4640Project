@@ -55,9 +55,15 @@ $user = [
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> 
     
         <script type="text/javascript">
+          
           var books = <?php echo json_encode($user["books"]); ?>;
 
-          function displayBooks() {
+          function onLoad() {
+            displayBooks();
+            setSearchbar();
+          }
+
+          function displayBooks () {
             var table = document.getElementById("book-table");
 
             books.forEach((book) => {
@@ -65,14 +71,24 @@ $user = [
               newRow.insertCell(0).textContent = book.title;
               newRow.insertCell(1).textContent = book.author;
               newRow.insertCell(2).innerHTML =
-                `<button class="btn btn-sm btn-danger" onclick="location.href='delete.php?title=${book.title}'";>Delete</button>`; //NEED TO ADD DELETE FUNCTION
+                `<button class="btn btn-sm btn-danger" onclick="location.href='delete.php?title=${book.title}'";>Delete</button>`;
             });
           }
+
+          function setSearchbar() {
+            var searchbar = document.getElementById("searchbar");
+            if(books.length === 0){
+              searchbar.setAttribute("disabled", "true");
+            } else {
+              searchbar.removeAttribute("disabled");
+            }
+          }
+
         </script>
     
      </head>
 
-    <body onload="displayBooks()">
+    <body onload="onLoad()">
       <div>
       <nav
         class="navbar navbar-light navbar-expand-lg sticky-top"
@@ -96,11 +112,11 @@ $user = [
           <div class="collapse navbar-collapse" id="navbarsTop">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item hover-item">
-                <a class="nav-link active" aria-current="page"
+                <a class="nav-link" aria-current="page"
                   href="home.php">Home</a>
               </li>
               <li class="nav-item hover-item">
-                <a class="nav-link" aria-current="page" href="books.php">Saved
+                <a class="nav-link active" aria-current="page" href="books.php">Saved
                   Books</a>
               </li>
               <li class="nav-item hover-item">
@@ -142,6 +158,7 @@ $user = [
               <div class="search">
                 <i class="fa fa-search">Search your books</i
                 ><input
+                  id="searchbar"
                   type="text"
                   class="form-control"
                   placeholder="Search"
@@ -150,6 +167,7 @@ $user = [
 
               <br />
 
+              <button style="margin-bottom: 20px;"><a href='home.php'>Add new books</a></button>
               <table id="book-table" class="table table-striped">
                 <tr class="table-dark">
                   <th style="text-align: center;">Title</th>
@@ -158,17 +176,6 @@ $user = [
                 </tr>
               </table>
 
-              <div>
-
-                <?php
-                  if (empty($user["books"])) {
-                    echo "<div class='alert alert-danger'>No books in your library
-                      <button><a href='home.php'>Add new books</a></button>
-                      </div>";
-                  }
-                ?>
-
-            </div>
           </div>
         </div>
     </div>

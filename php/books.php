@@ -54,7 +54,7 @@ $user = [
         <title>myBrary</title>
         <link rel="stylesheet" href="../styles/main.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> 
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
         <script type="text/javascript">
           
           var books = <?php echo json_encode($user["books"]); ?>;
@@ -85,7 +85,7 @@ $user = [
             }
           }
 
-          function searchBooks() {
+          $(document).ready(function() {
             $("#searchbar").keyup(function () {
               var value = this.value.toLowerCase().trim();
 
@@ -99,7 +99,7 @@ $user = [
                   });
               });
             });
-          }
+          })
         </script>
     
      </head>

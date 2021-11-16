@@ -84,7 +84,7 @@ $user = [
               searchbar.removeAttribute("disabled");
             }
           }
-
+          // anonymous function
           $(document).ready(function() {
             $("#searchbar").keyup(function () {
               var value = this.value.toLowerCase().trim();

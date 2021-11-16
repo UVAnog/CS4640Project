@@ -100,7 +100,7 @@ $user = [
         <title>myBrary</title>
         <link rel="stylesheet" href="../styles/main.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> 
-    
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
         <script>
 
           function onLoad() {
@@ -150,6 +150,23 @@ $user = [
               searchbar.removeAttribute("disabled");
             }
           }
+          
+          // anonymous function
+          $(document).ready(function() {
+            $("#searchbar").keyup(function () {
+              var value = this.value.toLowerCase().trim();
+
+              $("#note-table tr").each(function (index) {
+                  if (!index) return;
+                  $(this).find("td").each(function () {
+                      var id = $(this).text().toLowerCase().trim();
+                      var not_found = (id.indexOf(value) == -1);
+                      $(this).closest('tr').toggle(!not_found);
+                      return not_found;
+                  });
+              });
+            });
+          })
 
         </script>
 
@@ -254,7 +271,7 @@ $user = [
 
                       <table id="note-table" class="table table-striped" style="margin-top: 20px;">
                         <tr class="table-dark">
-                          <th style="text-align: center;">Book Title</th>
+                          <th id="title style="text-align: center;">Book Title</th>
                           <th style="text-align: center;">Note Text</th>
                           <th style="text-align: center;">Actions</th>
                         </tr>

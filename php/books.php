@@ -69,6 +69,16 @@ $user = [
             });
           }
         </script>
+        <script>
+          $(document).ready(function(){
+            $("#myInput").on("keyup", function() {
+              var value = $(this).val().toLowerCase();
+              $("#myList li").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+              });
+            });
+          });
+        </script>
     
      </head>
 
@@ -142,6 +152,7 @@ $user = [
               <div class="search">
                 <i class="fa fa-search">Search your books</i
                 ><input
+                  id="myInput"
                   type="text"
                   class="form-control"
                   placeholder="Search"

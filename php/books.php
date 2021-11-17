@@ -141,27 +141,13 @@ $user = [
             </ul>
 
             <li class="nav-item dropdown" style="list-style-type: none">
-            <p> User: <?=$user["email"]?> </p>  
-            <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                <img
-                  src="../assets/user.png"
-                  style="width: 25px; height: 25px"
-                />
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Something else here</a>
+            <p> User: <?=$user["email"]?> </p>               
+            <div class="" aria-labelledby="navbarDropdown">
+              <div>
+                <button class="btn btn-primary"><a style="color: white;
+                    text-decoration: none" href="index.php">Sign Out</a></button>
               </div>
+            </div>
             </li>
 
           </div>

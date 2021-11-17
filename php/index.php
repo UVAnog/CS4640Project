@@ -70,6 +70,22 @@ if (isset($_POST["email"])) { /// validate the email coming in
         <title>myBrary</title>
         <link rel="stylesheet" href="../styles/main.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> 
+    
+        <script>
+
+            function validateForm() {
+                let email = document.getElementById("email").value;
+                if(!email.includes("@")){
+                    alert("Error: Email must include '@'!")
+                    return false;
+                }
+                if(!email.includes(".")){
+                    alert("Error: Email must include '.'!")
+                    return false;
+                }
+          }
+
+        </script>
     </head>
     <body>
         <div class="container" style="margin-top: 15px;">
@@ -84,7 +100,7 @@ if (isset($_POST["email"])) { /// validate the email coming in
                         echo "<div class='alert alert-danger'>$error_msg</div>";
                     }
                 ?>
-                <form action="index.php" method="post">
+                <form action="index.php" onsubmit="return validateForm()" method="post">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email"/>

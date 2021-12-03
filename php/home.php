@@ -124,6 +124,9 @@ if (isset($_POST["title"])) { // validate the title coming in
               <li class="nav-item hover-item">
                 <a class="nav-link" href="notes.php">Saved Notes</a>
               </li>
+              <li class="nav-item hover-item">
+                <a class="nav-link" href="profile.php">Profile</a>
+              </li>
             </ul>
 
             <div class="" aria-labelledby="navbarDropdown">

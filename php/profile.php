@@ -44,6 +44,15 @@ $user = [
 ?>
 
 <!DOCTYPE html>
+<style>
+  .outer-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  }
+
+</style>
 <html>
     <head>
         <meta charset="UTF-8">  
@@ -57,49 +66,6 @@ $user = [
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
         <script type="text/javascript">
           
-          var books = <?php echo json_encode($user["books"]); ?>;
-
-          function onLoad() {
-            displayBooks();
-            setSearchbar();
-          }
-
-          function displayBooks () {
-            var table = document.getElementById("book-table");
-
-            books.forEach((book) => {
-              var newRow = table.insertRow(table.rows.length);
-              newRow.insertCell(0).textContent = book.title;
-              newRow.insertCell(1).textContent = book.author;
-              newRow.insertCell(2).innerHTML =
-                `<button class="btn btn-sm btn-danger" onclick="location.href='delete.php?title=${book.title}'";>Delete</button>`;
-            });
-          }
-
-          function setSearchbar() {
-            var searchbar = document.getElementById("searchbar");
-            if(books.length === 0){
-              searchbar.setAttribute("disabled", "true");
-            } else {
-              searchbar.removeAttribute("disabled");
-            }
-          }
-          // anonymous function
-          $(document).ready(function() {
-            $("#searchbar").keyup(function () {
-              var value = this.value.toLowerCase().trim();
-
-              $("#book-table tr").each(function (index) {
-                  if (!index) return;
-                  $(this).find("td").each(function () {
-                      var id = $(this).text().toLowerCase().trim();
-                      var not_found = (id.indexOf(value) == -1);
-                      $(this).closest('tr').toggle(!not_found);
-                      return not_found;
-                  });
-              });
-            });
-          })
         </script>
     
      </head>
@@ -157,34 +123,17 @@ $user = [
         </div>
       </nav>
       </div>
-        <div class="container searchbar">
-          <div class="row height d-flex">
-            <div class="col-md-8">
-              <div class="search">
-                <i class="fa fa-search">Search your books</i
-                ><input
-                  id="searchbar"
-                  type="text"
-                  class="form-control"
-                  placeholder="Search"
-                /><button class="btn btn-primary" onclick=searchBooks()>Search</button>
-              </div>
-
-              <br />
-
-              <button style="margin-bottom: 20px;"><a href='home.php'>Add new books</a></button>
-              <table id="book-table" class="table table-striped">
-                  <tr class="table-dark">
-                    <th style="text-align: center;">Title</th>
-                    <th style="text-align: center;">Author</th>
-                    <th style="text-align: center;">Actions</th>
-                  </tr>
-                </ul>
-              </table>
-
-          </div>
-        </div>
+      <div class="outer-div">
+        <div>
+          <h3>Current Profile: <?=$user["email"]?></h3>        
+      </div>
+    
     </div>
+    <div class="outer-div">
+        <div>
+          <button class="btn btn-primary"><a style="color: white;
+                    text-decoration: none" href='../angular/dist/angular'>Edit Profile</a></button>     
+      </div>
 
         <script
           src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"

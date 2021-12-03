@@ -93,8 +93,6 @@ if (isset($_POST["email"])) { /// validate the email coming in
                 <a class="navbar-brand" href="index.html"><img src="../assets/logo.svg" /></a>
                 <p> Welcome to our site!  To get started, login below or enter a new username and password to create an account</p>
             </div>
-            
-                <a href='../angular/dist/angular'> Angular </a>
         
             <div class="row justify-content-center">
                 <div class="col-4">

@@ -232,7 +232,7 @@ $user = [
                 <a class="nav-link active" href="notes.php">Saved Notes</a>
               </li>
               <li class="nav-item hover-item">
-                <a class="nav-link" href="profile.php">Profile</a>
+                <a class="nav-link" href="../angular/dist/angular">Profile</a>
               </li>
             </ul>
 

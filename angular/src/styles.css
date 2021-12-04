@@ -1,1 +1,81 @@
 /* You can add global styles to this file, and also import other style files */
+.hover-item :hover {
+  text-decoration: underline;
+  text-decoration-color: red;
+  font-size: 17px;
+}
+
+.height {
+  height: 100vh;
+}
+
+.search {
+  position: relative;
+  box-shadow: 0 0 40px (51, 51, 51, 0.1) rgba;
+}
+
+.searchbar {
+  padding-top: 64px;
+}
+
+.search input {
+  height: 60px;
+  text-indent: 25px;
+  border: 2px solid #d6d4d4;
+}
+
+.search input:focus {
+  box-shadow: none;
+  border: 2px solid navy;
+}
+
+.search .fa-search {
+  position: relative;
+  left: 16px;
+}
+
+.search button {
+  position: absolute;
+  top: 30px;
+  right: 5px;
+  height: 50px;
+  width: 100px;
+  background: navy;
+}
+
+/* images */
+.book1 {
+  margin-top: -500px;
+}
+
+.float-container {
+  border: 3px solid #fff;
+  padding: 20px;
+}
+
+.float-child {
+  width: 50%;
+  float: left;
+  padding: 20px;
+}
+
+.notes {
+  margin-top: 450px;
+}
+
+.notes-buttons {
+  padding-top: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+td {
+  width: 50%;
+  text-align: center;
+}
+
+.book {
+  width: 50%;
+  height: auto;
+}

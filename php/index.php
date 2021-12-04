@@ -1,3 +1,5 @@
+<!-- Website URL: https://cs4640.cs.virginia.edu/ywb9znu/project/php/ -->
+
 <?php
 /** DATABASE SETUP **/
 include('./database_connection.php');
@@ -63,6 +65,8 @@ if (isset($_POST["email"])) { /// validate the email coming in
 <!DOCTYPE html>
 <html>
     <head>
+<!-- Website URL: https://cs4640.cs.virginia.edu/ywb9znu/project/php/ -->
+
         <meta charset="UTF-8">  
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="author" content="Nolan Harris, Yaseen Bhuiyan">
